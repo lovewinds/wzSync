@@ -1,0 +1,20 @@
+﻿<Window x:Class="wzSync_WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="wzSync" Height="350" Width="525">
+    <Grid>
+        <ListView HorizontalAlignment="Left" Height="300" Margin="10,10,0,0" VerticalAlignment="Top" Width="417" Name="list_main">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn/>
+                </GridView>
+            </ListView.View>
+            <ListBoxItem/>
+            <MenuItem/>
+            <ListBoxItem/>
+        </ListView>
+        <Button Content="폴더 설정" HorizontalAlignment="Left" Margin="432,10,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+        <Button Content="전송" HorizontalAlignment="Left" Margin="432,37,0,0" VerticalAlignment="Top" Width="75"/>
+
+    </Grid>
+</Window>
