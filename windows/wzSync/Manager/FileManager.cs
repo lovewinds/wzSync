@@ -13,8 +13,10 @@ namespace wzSync.Manager
         private BackgroundWorker bw_fileLoader = new BackgroundWorker();
         private int progress = 0;
 
+        private FileSystemWatcher fs = new FileSystemWatcher();//개체 생성 
+
         // Singleton
-        private static FileManager instance = null;
+        private static FileManager _instance = null;
 
         public static CustomEventHandler customEvent = new CustomEventHandler();
 
@@ -26,13 +28,16 @@ namespace wzSync.Manager
             bw_fileLoader.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_fileLoader_WorkerCompleted);
         }
 
-        public static FileManager getInstance()
+        public static FileManager Instance
         {
-            if (instance == null)
+            get
             {
-                instance = new FileManager();
+                if (_instance == null)
+                {
+                    _instance = new FileManager();
+                }
+                return _instance;
             }
-            return instance;
         }
 
         public void Load( string path )
@@ -40,6 +45,7 @@ namespace wzSync.Manager
             if( bw_fileLoader.IsBusy == false )
             {
                 bw_fileLoader.RunWorkerAsync(path);
+                SetWatch(path);
             }
         }
 
@@ -47,6 +53,43 @@ namespace wzSync.Manager
         {
             get { return file_list; }
         }
+
+        public void SetWatch(string folderName)
+        {
+            fs.Path = folderName; //Test 폴더 감시 
+
+            fs.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            fs.Filter = ""; // *.*
+
+            fs.Created += new FileSystemEventHandler(fs_Created);
+            fs.Deleted += new FileSystemEventHandler(fs_Deleted);
+            fs.Renamed += new RenamedEventHandler(fs_Renamed);
+            fs.EnableRaisingEvents = true; //이벤트 활성화
+        }
+
+        #region Event Handler
+        private void fs_Created(object sender, FileSystemEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                string.Format("{0} / {1}", e.FullPath, e.ChangeType.ToString()) );
+            //AddLog(e.FullPath, e.ChangeType.ToString());
+            //UpdateFileList(e.Name, e.ChangeType);
+        }
+        private void fs_Renamed(object sender, RenamedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                string.Format("{0} / {1}", e.FullPath, e.ChangeType.ToString()));
+            //AddLog(e.FullPath, e.ChangeType.ToString());
+            //ModFileList(e.OldName, e.Name);
+        }
+        private void fs_Deleted(object sender, FileSystemEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                string.Format("{0} / {1}", e.FullPath, e.ChangeType.ToString()));
+            //AddLog(e.FullPath, e.ChangeType.ToString());
+            //UpdateFileList(e.Name, WatcherChangeTypes.Deleted);
+        }
+        #endregion
 
         #region Background Works
         private void Do_FileListLoad(object sender, DoWorkEventArgs wa)

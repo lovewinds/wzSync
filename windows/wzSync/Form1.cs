@@ -20,7 +20,7 @@ namespace wzSync
         {
             InitializeComponent();
             connHandler = WZConnectionHandler.getInstance();
-            fileManager = FileManager.getInstance();
+            fileManager = FileManager.Instance;
 
             WZConnectionHandler.customEvent.EventDelegate += new CustomEventDelegate(customEvent_EventDelegate);
             FileManager.customEvent.EventDelegate += new CustomEventDelegate(customEvent_EventDelegate);
