@@ -37,6 +37,7 @@ public class WZSync_WiFiManager extends BroadcastReceiver {
         else
         	Toast.makeText(context, "Not connected yet.", Toast.LENGTH_SHORT).show();
     }
+
 	
 	private String isConnected(Context ctx)
 	{
