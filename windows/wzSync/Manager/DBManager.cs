@@ -57,7 +57,7 @@ namespace wzSync.Manager
 
                 SQLiteConnectionStringBuilder sqlcsb = new SQLiteConnectionStringBuilder();
                 sqlcsb.DataSource = _startupPath + "./sync.db";
-                sqlcsb.Password = "sync";
+                //sqlcsb.Password = "sync";
 
                 try
                 {

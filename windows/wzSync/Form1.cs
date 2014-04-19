@@ -67,7 +67,7 @@ namespace wzSync
         {
             listView_file.Items.Clear();
 
-            fileManager.Load("E:\\음악");
+            fileManager.Load("D:\\music");
         }
     }
 }

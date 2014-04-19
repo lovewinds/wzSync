@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
 			{
 			case R.id.button_test:
 				WZSync_WiFiManager wifi = new WZSync_WiFiManager();
-				wifi.GetCurrentStatus(getActivity().getApplicationContext());
+				wifi.isConnected(getActivity().getApplicationContext());
 				//NetworkManager.getInstance().connect();
 				//Toast.makeText(getActivity(), "Test", Toast.LENGTH_SHORT).show();
 				break;

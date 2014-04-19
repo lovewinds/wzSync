@@ -200,4 +200,5 @@ local.properties
 proguard/
 
 # Eclipse settings
-android/.metadata
+.metadata/
+.settings/

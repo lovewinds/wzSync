@@ -13,7 +13,7 @@ namespace wzSync.Manager
         private BackgroundWorker bw_fileLoader = new BackgroundWorker();
         private int progress = 0;
 
-        private FileSystemWatcher fs = new FileSystemWatcher();//개체 생성 
+        private FileSystemWatcher fs = new FileSystemWatcher(); //개체 생성
 
         // Singleton
         private static FileManager _instance = null;
@@ -105,13 +105,19 @@ namespace wzSync.Manager
             string[] fileEntries = Directory.GetFiles(path);
             int current = 0;
             int max = fileEntries.Length;
+
+            XMLGenerator xml = new XMLGenerator();
+
+            xml.XML_StartCreatedFileList(fileEntries.Length);
             foreach (string fileName in fileEntries)
             {
                 FileInfo fi = new FileInfo(fileName);
                 file_list.Add(new FileItem(fi.Name, path, fi.Length));
 
+                xml.XML_AppendCreatedFile(fi);
                 worker.ReportProgress(current / max);
             }
+            xml.XML_EndCreatedFileList();
         }
         private void bw_fileLoader_ProgressChanged( object sender, ProgressChangedEventArgs pe )
         {
