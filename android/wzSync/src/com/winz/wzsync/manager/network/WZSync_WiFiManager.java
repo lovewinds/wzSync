@@ -11,23 +11,22 @@ import android.widget.Toast;
 import com.winz.wzsync.manager.file.WZSync_FileManager;
 
 public class WZSync_WiFiManager extends BroadcastReceiver {
-	private WZSync_FileManager fileManager = new WZSync_FileManager();
-	
+
 	@Override
     public void onReceive(final Context context, final Intent intent) {
- 
-        String status = isConnected(context);
-        if( status != null )
-        	Toast.makeText(context, status, Toast.LENGTH_SHORT).show();
+		String ssid = null;
+		boolean connected = isConnected(context, ssid);
+        if( connected == true )
+        	Toast.makeText(context, ssid, Toast.LENGTH_SHORT).show();
         else
         	Toast.makeText(context, "Not connected yet.", Toast.LENGTH_SHORT).show();
     }
 
 	
-	public String isConnected(Context ctx)
+	public boolean isConnected(Context ctx, String ssid)
 	{
-		String result = null;
-		
+		boolean result = false;
+		String ssid_name = null;
 		WifiManager wManager;
 		wManager = (WifiManager)ctx.getSystemService(Context.WIFI_SERVICE);
 		WifiInfo wInfo = wManager.getConnectionInfo();      
@@ -37,11 +36,12 @@ public class WZSync_WiFiManager extends BroadcastReceiver {
 		{   		
 			Log.d("wifi", "WiFi is Enabled");
 			Log.d("wifi", "SSID : " + wInfo.getSSID() );
-			result = wInfo.getSSID();
-			if( result.compareTo("\"miroonamu\"")==0)
+			ssid_name = wInfo.getSSID();
+			if( ssid_name.compareTo("\"ariens\"")==0)
 			{
+				result = true;
+				ssid = ssid_name;
 				Log.d("wzSync", "I'm here!");
-				fileManager.WriteFile();
 			}
 		}
 		else

@@ -3,6 +3,7 @@ package com.winz.wzsync.manager.network;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -26,6 +27,21 @@ public class WZSync_NetworkManager extends AsyncTask<Void, Void, Void>
 		fileManager = new WZSync_FileManager();
 	}
 	
+	public void finalize()
+	{
+		try
+		{
+			if( clientSocket != null )
+			{
+				clientSocket.close();
+			}
+		}
+		catch(Exception e )
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public static WZSync_NetworkManager getInstance()
 	{
 		if( instance == null )
@@ -37,7 +53,7 @@ public class WZSync_NetworkManager extends AsyncTask<Void, Void, Void>
 	
 	public void connect()
 	{
-		if( clientSocket.isConnected() == true )
+		if( clientSocket != null && clientSocket.isConnected() == true )
 		{
 			Log.d("wzSync", "Already Connected.");
 		}
@@ -45,6 +61,27 @@ public class WZSync_NetworkManager extends AsyncTask<Void, Void, Void>
 		{
 			Log.d("wzSync", "Trying to connect server...");
 			instance.execute();
+		}
+	}
+	
+	public void sendMessage()
+	{
+		try
+		{
+			if( clientSocket != null && clientSocket.isConnected() )
+			{
+				OutputStream out = clientSocket.getOutputStream();
+				ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
+				
+				String str = "Hello? I'm android.";
+				bos.write(str.getBytes());
+				
+				bos.writeTo(out);
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 
@@ -66,10 +103,7 @@ public class WZSync_NetworkManager extends AsyncTask<Void, Void, Void>
 				byteArrayOutputStream.write(buffer, 0, bytesRead);
 				Log.d("wzSync",
 						String.format("[%d] : %s", cnt++,  byteArrayOutputStream.toString("UTF-8")));
-				
 			}
-			clientSocket.close();
-			
 		}
 		catch( UnknownHostException e ) {
 			e.printStackTrace();

@@ -144,8 +144,6 @@ namespace wzSync.wzSocket
                 msg = string.Format("Receive Data : {0}", e.SocketError);
                 Debug.WriteLine(msg);
 
-
-
                 clientSock.ReceiveAsync(m_ReceiveAsyncEventArg);
             }
             else
@@ -159,9 +157,7 @@ namespace wzSync.wzSocket
                 m_AcceptAsyncEventArg.Completed += myAsyncAccept;
                 listener.AcceptAsync(m_AcceptAsyncEventArg);
             }
-            
         }
-
 
         public void SendMessage(string msg)
         {

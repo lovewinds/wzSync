@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
+import com.winz.wzsync.manager.file.WZSync_FileManager;
+import com.winz.wzsync.manager.network.WZSync_NetworkManager;
 import com.winz.wzsync.manager.network.WZSync_WiFiManager;
 
 public class MainActivity extends Activity {
@@ -60,6 +62,7 @@ public class MainActivity extends Activity {
 					false);
 			
 			rootView.findViewById(R.id.button_test).setOnClickListener(this);
+			rootView.findViewById(R.id.button_connect).setOnClickListener(this);
 			/*
 			findViewById(R.id.button_test).setOnClickListener(
 					new Button.OnClickListener() {
@@ -72,11 +75,21 @@ public class MainActivity extends Activity {
 		}
 		
 		public void onClick( View v ) {
+			WZSync_NetworkManager net = WZSync_NetworkManager.getInstance();
+			
 			switch(v.getId())
 			{
 			case R.id.button_test:
+				net.sendMessage();
+				break;
+				
+			case R.id.button_connect:
 				WZSync_WiFiManager wifi = new WZSync_WiFiManager();
-				wifi.isConnected(getActivity().getApplicationContext());
+				boolean status = wifi.isConnected(getActivity().getApplicationContext(), null);
+				if( status == true )
+				{
+					net.connect();
+				}
 				//NetworkManager.getInstance().connect();
 				//Toast.makeText(getActivity(), "Test", Toast.LENGTH_SHORT).show();
 				break;

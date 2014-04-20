@@ -41,10 +41,15 @@ public class WZSync_FileManager {
 	{
 		try
 		{
-			File file = new File( path, File.separator+"wzSync.log" );
-			if( file.createNewFile() )
+			File file = new File( path+File.separator+"wzSync.log" );
+			Log.d("wzSync","[FileMgr] Trying to create file : "+path+File.separator+"wzSync.log");
+			if( file.exists() )
 			{
-				if( file.canWrite() )
+				Log.d("wzSync","[FileMgr] Already exists file! ");
+			}
+			else
+			{
+				if( file.createNewFile() )
 				{
 					
 					FileWriter fw = new FileWriter(file);
@@ -53,20 +58,15 @@ public class WZSync_FileManager {
 					bfw.flush();
 					bfw.close();
 					
-					fw.flush();
+					//fw.flush();
 					fw.close();
 					//FileOutputStream fos = new FileOutputStream(파일명);
 				}
 				else
 				{
-					Log.d("wzSync","[FileMgr] Can't write file on : "+path);
+					Log.d("wzSync","[FileMgr] Can't create file on : "+path);
 				}
 			}
-			else
-			{
-				Log.d("wzSync","[FileMgr] Can't create file on : "+path);
-			}
-			
 		}
 		catch(Exception e)
 		{
