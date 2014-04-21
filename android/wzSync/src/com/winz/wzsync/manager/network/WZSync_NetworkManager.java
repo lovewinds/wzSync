@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import android.os.AsyncTask;
@@ -55,6 +56,7 @@ public class WZSync_NetworkManager extends AsyncTask<Void, Void, Void>
 	{
 		if( clientSocket != null && clientSocket.isConnected() == true )
 		{
+			
 			Log.d("wzSync", "Already Connected.");
 		}
 		else
@@ -108,9 +110,23 @@ public class WZSync_NetworkManager extends AsyncTask<Void, Void, Void>
 		catch( UnknownHostException e ) {
 			e.printStackTrace();
 		}
+		catch( SocketException se )
+		{
+			try
+			{
+				clientSocket.close();
+				clientSocket = null;
+				Log.d("wzSync","Connection is lost.");
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 		catch( IOException e ) {
 			e.printStackTrace();
 		}
+		
 		return null;
 	}
 	
