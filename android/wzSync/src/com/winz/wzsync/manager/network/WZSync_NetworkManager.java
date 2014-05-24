@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
+import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -32,6 +33,7 @@ public class WZSync_NetworkManager extends Thread
     private HashMap<String, Integer> uuidToSize = new HashMap<String, Integer>();
     private Selector selector = null;
 	private SocketChannel clientChannel = null;
+	private DatagramChannel broadcastChannel = null;
 
     
 	private WZSync_NetworkManager()
@@ -66,7 +68,6 @@ public class WZSync_NetworkManager extends Thread
 		if(isRunning == false)
 		{
 			instance.start();
-			
 			Log.d("wzSync", "Network thread start.");
 		}
 		else
@@ -79,6 +80,7 @@ public class WZSync_NetworkManager extends Thread
 	{
 		try
 		{
+			// To avoid android.os.NetworkOnMainThreadException
 			Thread t = new Thread(new Runnable(){
 				public void run() {
 					// TODO 자동 생성된 메소드 스텁

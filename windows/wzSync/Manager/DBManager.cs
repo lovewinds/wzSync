@@ -39,7 +39,8 @@ namespace wzSync.Manager
 
         ~DBManager()
         {
-            if (_instance.SQL.State == System.Data.ConnectionState.Open)
+            if (_instance.SQL != null &&
+                _instance.SQL.State == System.Data.ConnectionState.Open)
             {
                 _instance.SQL.Close();
             }
@@ -52,7 +53,7 @@ namespace wzSync.Manager
             /* DB File 생성 */
             if (File.Exists(".\\sync.db") == false)
             {
-                SQLiteFactory sqf = SQLiteFactory.Instance;
+                //SQLiteFactory sqf = SQLiteFactory.Instance;
                 SQLiteConnection.CreateFile(".\\sync.db");
 
                 SQLiteConnectionStringBuilder sqlcsb = new SQLiteConnectionStringBuilder();
@@ -151,7 +152,8 @@ namespace wzSync.Manager
 
         public bool DBClose()
         {
-            if (_instance.SQL.State == System.Data.ConnectionState.Open)
+            if (_instance.SQL != null &&
+                _instance.SQL.State == System.Data.ConnectionState.Open)
             {
                 _instance.SQL.Close();
                 return true;
@@ -315,6 +317,23 @@ namespace wzSync.Manager
             {
                 //Debug.WriteLine(E.ToString());
             }
+        }
+
+        public void InsertFile(string path, string name, string ext, long size)
+        {
+            string query = string.Format(@"
+                INSERT INTO Files (
+	                {0},
+	                {1},
+	                {2},
+	                'TEST',
+	                'TEST',
+	                'TEST',
+	                {3},
+	                0
+                );
+            ", path, name, size, ext);
+            ExecuteQuery(query);
         }
     }
 

@@ -12,6 +12,7 @@ namespace wzSync.Manager
         private List<FileItem> file_list = null;
         private BackgroundWorker bw_fileLoader = new BackgroundWorker();
         private int progress = 0;
+        private DBManager db = DBManager.Instance;
 
         private FileSystemWatcher fs = new FileSystemWatcher(); //개체 생성
 
@@ -74,6 +75,8 @@ namespace wzSync.Manager
                 string.Format("{0} / {1}", e.FullPath, e.ChangeType.ToString()) );
             //AddLog(e.FullPath, e.ChangeType.ToString());
             //UpdateFileList(e.Name, e.ChangeType);
+            FileInfo fi = new FileInfo(e.FullPath);
+            db.InsertFile(fi.FullName, fi.Name, fi.Extension, fi.Length);
         }
         private void fs_Renamed(object sender, RenamedEventArgs e)
         {
