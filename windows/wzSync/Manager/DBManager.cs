@@ -9,28 +9,17 @@ namespace wzSync.Manager
 {
     class DBManager
     {
-        SQLiteConnection SQL = null;
-        SQLiteCommand CMD = null;
         private static DBManager _instance = null;
+
+        private SQLiteConnection sqlConn = null;
+        private SQLiteCommand sqlCommand = null;
+        
         private static Queue<string> q_QueryBuffer;
         private static SQLiteDataReader reader;
         private Thread th_ExecuteBufferThread;
-        private string _startupPath = System.Windows.Forms.Application.StartupPath;
+        private const string _startupPath = System.Windows.Forms.Application.StartupPath;
 
-        public SQLiteDataReader Reader
-        {
-            get
-            {
-                if (reader.IsClosed)
-                {
-                    return null;
-                }
-                else
-                {
-                    return reader;
-                }
-            }
-        }
+        #region Initialize
         private DBManager()
         {
             q_QueryBuffer = new Queue<string>();
@@ -39,15 +28,36 @@ namespace wzSync.Manager
 
         ~DBManager()
         {
-            if (_instance.SQL != null &&
-                _instance.SQL.State == System.Data.ConnectionState.Open)
+            if (_instance.sqlConn != null &&
+                _instance.sqlConn.State == System.Data.ConnectionState.Open)
             {
-                _instance.SQL.Close();
+                _instance.sqlConn.Close();
             }
             th_ExecuteBufferThread.Abort();
             th_ExecuteBufferThread = null;
         }
 
+        public DBManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new DBManager();
+                }
+                return _instance;
+            }
+        }
+        #endregion
+
+        public SQLiteDataReader Reader
+        {
+            get
+            {
+                if (reader.IsClosed) return null;
+                return reader;
+            }
+        }
         private bool CreateDBFile()
         {
             /* DB File 생성 */
@@ -62,11 +72,11 @@ namespace wzSync.Manager
 
                 try
                 {
-                    _instance.SQL = new SQLiteConnection(sqlcsb.ConnectionString);
-                    _instance.CMD = new SQLiteCommand(_instance.SQL);
-                    if (_instance.SQL.State == System.Data.ConnectionState.Closed)
+                    _instance.sqlConn = new SQLiteConnection(sqlcsb.ConnectionString);
+                    _instance.sqlCommand = new SQLiteCommand(_instance.sqlConn);
+                    if (_instance.sqlConn.State == System.Data.ConnectionState.Closed)
                     {
-                        _instance.SQL.Open();
+                        _instance.sqlConn.Open();
                     }
                     _instance.ExecuteNonQuery(
                         "Create Table Files ("+
@@ -94,40 +104,6 @@ namespace wzSync.Manager
             }
         }
 
-        public static DBManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new DBManager();
-                }
-                if (!_instance.CreateDBFile())
-                {
-                    SQLiteConnectionStringBuilder sqlcsb = new SQLiteConnectionStringBuilder();
-                    sqlcsb.DataSource = "./sync.db";
-                    //sqlcsb.Password = "sync";
-
-                    try
-                    {
-                        _instance.SQL = new SQLiteConnection(sqlcsb.ConnectionString);
-                        _instance.CMD = new SQLiteCommand(_instance.SQL);
-                        if (_instance.SQL.State == System.Data.ConnectionState.Closed)
-                        {
-                            _instance.SQL.Open();
-                        }
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(_instance.ExecuteBuffer), null);
-                    }
-                    catch (SQLiteException e)
-                    {
-                        System.Diagnostics.Debug.WriteLine(e.ToString());
-                    }
-                }
-
-                return _instance;
-            }
-        }
-
         private Queue<string> QueryBuffer
         {
             get
@@ -152,10 +128,10 @@ namespace wzSync.Manager
 
         public bool DBClose()
         {
-            if (_instance.SQL != null &&
-                _instance.SQL.State == System.Data.ConnectionState.Open)
+            if (_instance.sqlConn != null &&
+                _instance.sqlConn.State == System.Data.ConnectionState.Open)
             {
-                _instance.SQL.Close();
+                _instance.sqlConn.Close();
                 return true;
             }
             return false;
@@ -167,8 +143,8 @@ namespace wzSync.Manager
             {
                 for (int i = 0; i < querySize; i++)
                 {
-                    _instance.CMD.CommandText = query[i];
-                    _instance.CMD.ExecuteNonQuery();
+                    _instance.sqlCommand.CommandText = query[i];
+                    _instance.sqlCommand.ExecuteNonQuery();
                 }
                 return true;
             }
@@ -183,8 +159,8 @@ namespace wzSync.Manager
         {
             try
             {
-                _instance.CMD.CommandText = query;
-                _instance.CMD.ExecuteNonQuery();
+                _instance.sqlCommand.CommandText = query;
+                _instance.sqlCommand.ExecuteNonQuery();
             }
             catch (SQLiteException e)
             {
@@ -202,8 +178,8 @@ namespace wzSync.Manager
         {
             try
             {
-                _instance.CMD.CommandText = query;
-                reader = _instance.CMD.ExecuteReader();
+                _instance.sqlCommand.CommandText = query;
+                reader = _instance.sqlCommand.ExecuteReader();
                 return reader;
             }
             catch (SQLiteException e)
@@ -235,8 +211,8 @@ namespace wzSync.Manager
         {
             try
             {
-                _instance.CMD.CommandText = "BEGIN";
-                _instance.CMD.ExecuteNonQuery();
+                _instance.sqlCommand.CommandText = "BEGIN";
+                _instance.sqlCommand.ExecuteNonQuery();
                 //Debug.WriteLine("NonQueryStart");
                 return true;
             }
@@ -251,8 +227,8 @@ namespace wzSync.Manager
         {
             try
             {
-                _instance.CMD.CommandText = "COMMIT";
-                _instance.CMD.ExecuteNonQuery();
+                _instance.sqlCommand.CommandText = "COMMIT";
+                _instance.sqlCommand.ExecuteNonQuery();
                 //Debug.WriteLine("NonQueryEnd");
                 return true;
             }
